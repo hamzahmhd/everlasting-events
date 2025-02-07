@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "target": "ES2017",
+      "module": "CommonJS",
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "baseUrl": "./", // Add this
+      "paths": {
+        "@/*": ["src/*"] // Add this to resolve aliases
+      }
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist", ".next"]
+  }
+  

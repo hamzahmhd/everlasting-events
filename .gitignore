@@ -1,4 +1,60 @@
-node_modules/
-.env
-.next/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules/
+/.pnp
+.pnp.*
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Prisma
 prisma/dev.db
+prisma/*.db-journal
+prisma/.env
+
+# Miscellaneous
+.DS_Store
+*.pem
+*.log
+*.swp
+*.swo
+*.tmp
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Files
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Google OAuth Credentials (DO NOT COMMIT)
+google-calendar-token.json
+google-credentials.json
