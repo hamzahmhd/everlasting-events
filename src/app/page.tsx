@@ -13,7 +13,8 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Fixed Navbar */}
-      <header className="fixed top-0 w-full bg-[#23272A] text-white h-[58px] px-16 flex justify-between items-center shadow-md max-w-[1440px] mx-auto z-50 backdrop-blur-md font-circular">
+      <header className="fixed top-0 w-full bg-[#23272A] text-white h-[58px] px-16 flex justify-between items-center shadow-md z-50 backdrop-blur-md font-circular">
+
         <Link href="/">
           <Image src="/logo3.png" alt="Everlasting Events Logo" width={101} height={19} className="h-auto w-auto" />
         </Link>
