@@ -1,13 +1,24 @@
-console.log("Email worker is running and waiting for jobs...");
+import * as dotenv from "dotenv";
 
-import dotenv from "dotenv";
 dotenv.config();
 
 import { Worker } from "bullmq";
 import { sendEmail } from "./email";
 import IORedis from "ioredis";
 
-const connection = new IORedis(process.env.REDIS_URL || "redis://127.0.0.1:6379", {
+
+console.log("Email worker is running and waiting for jobs...");
+
+
+
+
+
+if (!process.env.REDIS_URL) {
+    throw new Error("REDIS_URL is not defined. Make sure your .env file is loaded correctly.");
+}
+
+const connection = new IORedis(process.env.REDIS_URL, {
+    tls: { rejectUnauthorized: false }, // Required for Upstash
     maxRetriesPerRequest: null, // Required for BullMQ compatibility
 });
 
@@ -24,6 +35,5 @@ emailWorker.on("completed", (job) => {
 
 emailWorker.on("failed", (job, err) => {
     console.error(`Job ${job?.id} failed:`, err.message || err);
-    console.error("Full Error Details:", err); // Log the entire error for debugging
+    console.error("Full Error Details:", err);
 });
-

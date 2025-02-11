@@ -1,10 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emailQueue = void 0;
-const bullmq_1 = require("bullmq");
-const ioredis_1 = __importDefault(require("ioredis"));
-const connection = new ioredis_1.default(process.env.REDIS_URL || "redis://127.0.0.1:6379");
-exports.emailQueue = new bullmq_1.Queue("emailQueue", { connection });
+var dotenv = require("dotenv");
+dotenv.config();
+var bullmq_1 = require("bullmq");
+var ioredis_1 = require("ioredis");
+if (!process.env.REDIS_URL) {
+    throw new Error("REDIS_URL is not defined. Make sure your .env file is loaded correctly.");
+}
+var connection = new ioredis_1.default(process.env.REDIS_URL, {
+    tls: { rejectUnauthorized: false } // Required for Upstash
+});
+exports.emailQueue = new bullmq_1.Queue("emailQueue", { connection: connection });
