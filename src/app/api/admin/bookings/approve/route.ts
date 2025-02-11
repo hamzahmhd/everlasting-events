@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailQueue } from "@/utils/emailQueue";
 import { insertConsultationEvent } from "@/utils/googleCalendar";
 
+
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
