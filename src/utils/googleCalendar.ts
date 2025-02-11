@@ -1,49 +1,44 @@
 import { google } from "googleapis";
-import fs from "fs";
-import * as path from "path";
 
-// Paths for token and credentials
-const TOKEN_PATH = path.join(process.cwd(), "google-calendar-token.json");
-const CREDENTIALS_PATH = path.join(process.cwd(), "google-credentials.json");
+if (!process.env.GOOGLE_CREDENTIALS) {
+  throw new Error("GOOGLE_CREDENTIALS environment variable is not set.");
+}
 
-// Initialize OAuth2 Client
-const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf-8"));
-const { client_secret, client_id, redirect_uris } = credentials.web;
-const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+// Load Google API credentials from environment variable
+const credentials = JSON.parse(
+  Buffer.from(process.env.GOOGLE_CREDENTIALS, "base64").toString("utf-8")
+);
 
-const tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, "utf-8"));
-oauth2Client.setCredentials(tokens);
+const auth = new google.auth.JWT(
+  credentials.client_email,
+  undefined,
+  credentials.private_key.replace(/\\n/g, "\n"), // Fixes newline formatting issue
+  ["https://www.googleapis.com/auth/calendar"]
+);
 
-// Function to insert a consultation event
-export async function insertConsultationEvent(calendarId: string, eventDetails: {
-  summary: string;
-  description: string;
-  start: string; // ISO 8601 format
-  end: string; // ISO 8601 format
-}) {
-  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+const calendar = google.calendar({ version: "v3", auth });
 
-  const event = {
-    summary: eventDetails.summary,
-    description: eventDetails.description,
-    start: {
-      dateTime: eventDetails.start,
-      timeZone: "America/Toronto", // Adjust time zone as needed
-    },
-    end: {
-      dateTime: eventDetails.end,
-      timeZone: "America/Toronto", // Adjust time zone as needed
-    },
-  };
-
+export async function insertConsultationEvent(
+  calendarId: string,
+  eventDetails: { summary: string; description: string; start: string; end: string }
+) {
   try {
+    const event = {
+      summary: eventDetails.summary,
+      description: eventDetails.description,
+      start: { dateTime: eventDetails.start, timeZone: "America/New_York" },
+      end: { dateTime: eventDetails.end, timeZone: "America/New_York" },
+    };
+
     const response = await calendar.events.insert({
       calendarId,
       requestBody: event,
     });
+
+    console.log("Google Calendar event created:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error creating Google Calendar event:", error);
-    throw error;
+    console.error("Error inserting event into Google Calendar:", error);
+    throw new Error("Failed to insert event into Google Calendar.");
   }
 }

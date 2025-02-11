@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
-import fs from "fs";
-import path from "path";
 
-const TOKEN_PATH = path.join(process.cwd(), "google-calendar-token.json");
+if (!process.env.GOOGLE_CREDENTIALS) {
+  throw new Error("GOOGLE_CREDENTIALS environment variable is not set.");
+}
 
-// Load client credentials
+// Load client credentials from environment variable
 const credentials = JSON.parse(
-  fs.readFileSync(path.join(process.cwd(), "google-credentials.json"), "utf-8")
+  Buffer.from(process.env.GOOGLE_CREDENTIALS, "base64").toString("utf-8")
 );
 const { client_secret, client_id, redirect_uris } = credentials.web;
 const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
@@ -24,11 +24,9 @@ export async function GET(req: Request) {
     // Exchange the code for tokens
     const { tokens } = await oauth2Client.getToken(code);
 
-    // Save the tokens for future use
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
-    console.log("Token stored to", TOKEN_PATH);
+    console.log("Received Google OAuth tokens:", tokens);
 
-    return NextResponse.json({ message: "Authentication successful! Tokens stored." });
+    return NextResponse.json({ message: "Authentication successful!", tokens });
   } catch (error) {
     console.error("Error in callback handler:", error);
     return NextResponse.json({ error: "Failed to handle callback" }, { status: 500 });
