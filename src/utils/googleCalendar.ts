@@ -4,17 +4,28 @@ if (!process.env.GOOGLE_CREDENTIALS) {
   throw new Error("GOOGLE_CREDENTIALS environment variable is not set.");
 }
 
-// Load Google API credentials from environment variable
+if (!process.env.GOOGLE_CALENDAR_TOKEN) {
+  throw new Error("GOOGLE_CALENDAR_TOKEN environment variable is not set.");
+}
+
+// Decode and parse credentials
 const credentials = JSON.parse(
   Buffer.from(process.env.GOOGLE_CREDENTIALS, "base64").toString("utf-8")
 );
 
-const auth = new google.auth.JWT(
-  credentials.client_email,
-  undefined,
-  credentials.private_key.replace(/\\n/g, "\n"), // Fixes newline formatting issue
-  ["https://www.googleapis.com/auth/calendar"]
+// Decode and parse token
+const tokens = JSON.parse(
+  Buffer.from(process.env.GOOGLE_CALENDAR_TOKEN, "base64").toString("utf-8")
 );
+
+const auth = new google.auth.OAuth2(
+  credentials.web.client_id,
+  credentials.web.client_secret,
+  credentials.web.redirect_uris[0]
+);
+
+// Set the credentials
+auth.setCredentials(tokens);
 
 const calendar = google.calendar({ version: "v3", auth });
 
